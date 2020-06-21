@@ -1,6 +1,7 @@
 package com.github.masahito.kotestsandbox.businesslogics
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.*
 import io.kotest.property.forAll
@@ -8,10 +9,14 @@ import java.time.LocalDate
 
 
 class BusinessLogicTests : FunSpec({
-
-    test("空ではないリストの合計はtailの合計にheadを足したもの") {
-        forAll<Int, List<Int>> { head, tail ->
-            ListUtil.sum(0, listOf(head) + tail) == head + ListUtil.sum(0, tail)
+    context("ListUtil.sum") {
+        test("空のリストの合計は0") {
+            ListUtil.sum(0, emptyList()).shouldBe(0)
+        }
+        test("空ではないリストの合計はtailの合計にheadを足したもの") {
+            forAll<Int, List<Int>> { head, tail ->
+                ListUtil.sum(0, listOf(head) + tail) == head + ListUtil.sum(0, tail)
+            }
         }
     }
 
@@ -79,7 +84,6 @@ class BusinessLogicTests : FunSpec({
         }
         forAll<CreditCard, Order>(expiredCardArb, orderArb) { card, order ->
             card.charge(order) == ChargeResult.Expired
-
         }
     }
 })
