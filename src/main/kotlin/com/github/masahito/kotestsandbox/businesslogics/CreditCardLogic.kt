@@ -20,9 +20,9 @@ data class CreditCard(
     val limit: LocalDate,
     val holder: String
 ) {
-    fun charge(order: Order, today: LocalDate? =LocalDate.now()): ChargeResult {
+    fun charge(order: Order, today: LocalDate? = LocalDate.now()): ChargeResult {
         // TODO: rewrite it, it's a restricted example.
-        return if (this.limit < today){
+        return if (this.limit < today) {
             ChargeResult.Expired
         } else {
             ChargeResult.SUCCESS
