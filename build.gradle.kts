@@ -12,12 +12,18 @@ repositories {
 	mavenCentral()
 }
 
+val versions by extra {
+	mapOf(
+		"kotest" to "4.0.6"
+	)
+}
+
 dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	testImplementation("io.kotest:kotest-runner-junit5-jvm:4.0.6") // for kotest framework
-	testImplementation("io.kotest:kotest-assertions-core-jvm:4.0.6") // for kotest core jvm assertions
-	testImplementation("io.kotest:kotest-property-jvm:4.0.6") // for kotest property test
+	testImplementation("io.kotest:kotest-runner-junit5-jvm:${versions["kotest"]}") // for kotest framework
+	testImplementation("io.kotest:kotest-assertions-core-jvm:${versions["kotest"]}") // for kotest core jvm assertions
+	testImplementation("io.kotest:kotest-property-jvm:${versions["kotest"]}") // for kotest property test
 }
 
 tasks.withType<Test> {

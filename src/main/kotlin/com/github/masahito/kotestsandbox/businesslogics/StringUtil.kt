@@ -5,7 +5,7 @@ typealias Adder<T> = (T) -> T
 
 object ListUtil {
 
-    fun <T : Number> T.toAdder(): Adder<T> {
+    private fun <T : Number> T.toAdder(): Adder<T> {
         return when (this) {
             is Long -> {
                 { it -> (this as Long + it as Long) as T }
