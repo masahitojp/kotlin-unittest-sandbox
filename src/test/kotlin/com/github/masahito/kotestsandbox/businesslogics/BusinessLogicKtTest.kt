@@ -1,9 +1,12 @@
 package com.github.masahito.kotestsandbox.businesslogics
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
+import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.*
+import io.kotest.property.checkAll
 import io.kotest.property.forAll
 import java.time.LocalDate
 
@@ -49,42 +52,42 @@ class BusinessLogicTests : FunSpec({
 
     test("クレジットの期限が今日より前ならば、決済結果は期限切れとなる") {
         val today = LocalDate.of(2020, 6, 1)
-        val expiredCardArb: Arb<CreditCard> = arb { rs ->
-            val nums = Arb.int(0, 9999).values(rs)
-            val holders = Arb.string(minSize = 1).values(rs)
-            val diffs = Arb.long(1, 24).values(rs)
-            nums.flatMap { num ->
-                diffs.flatMap { diff ->
-                    holders.map { holder ->
-                        val numStr = num.value.toString().padStart(4, '0')
-                        CreditCard(
-                            number = "${numStr}-${numStr}-${numStr}-${numStr}",
-                            limit = today.minusMonths(diff.value),
-                            holder = holder.value
-                        )
-                    }
-                }
-            }
+        val expiredCardArb: Arb<CreditCard> = Arb.bind(
+            Arb.int(0, 9999),
+            Arb.string(minSize = 1),
+            Arb.long(1, 24)
+        ) { num, holder, diff ->
+            val numStr = num.toString().padStart(4, '0')
+            CreditCard(
+                number = "${numStr}-${numStr}-${numStr}-${numStr}",
+                limit = today.minusMonths(diff),
+                holder = holder
+            )
+
         }
 
-        val orderArb: Arb<Order> = arb { rs ->
-            val ids = Arb.long(0L).values(rs)
-            val names = Arb.string(1, 24).values(rs)
-            ids.flatMap { id ->
-                names.map { name ->
-                    Order(
-                        Item(
-                            id = id.value,
-                            name = name.value
-                        )
+        val orderArb: Arb<Order> =
+            Arb.bind(
+                Arb.long(0L),
+                Arb.string(1, 24)
+            ) { a, b -> Order(Item(a, b)) }
 
-                    )
-                }
-            }
-        }
-        forAll<CreditCard, Order>(expiredCardArb, orderArb) { card, order ->
+        forAll<CreditCard, Order>(PropTestConfig(seed = 1), expiredCardArb, orderArb) { card, order ->
             card.charge(order) == ChargeResult.Expired
         }
     }
 })
 
+class PropertyExample: StringSpec({
+    "String size" {
+        forAll<String, String> (iterations = 10000){ a, b ->
+            (a + b).length == a.length + b.length
+        }
+    }
+
+    "String size2" {
+        checkAll<String, String> { a, b ->
+            (a + b).length shouldBe  a.length + b.length
+        }
+    }
+})
