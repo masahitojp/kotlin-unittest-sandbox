@@ -14,7 +14,7 @@ repositories {
 
 val versions by extra {
     mapOf(
-        "kotest" to "4.1.0"
+        "kotest" to "4.1.1"
     )
 }
 
